@@ -29,7 +29,7 @@ def meteo():
 
     # Parcourir la liste des relevés météo
     for list_element in json_content.get('list', []):
-        dt_value = list_element.get('dt')  # timestamp du relevé
+        dt_value = list_element.get('dt') 
         temp_value = list_element.get('main', {}).get('temp')  # température en Kelvin
 
         if temp_value is not None:

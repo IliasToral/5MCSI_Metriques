@@ -35,17 +35,22 @@ def mongraphique():
 def histogramme():
     return render_template("histogramme.html")
   
+@app.route('/')
+def hello_world():
+    return render_template('hello.html') #Comm2
+
 @app.route('/extract-minutes/<date_string>')
 def extract_minutes(date_string):
-        date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
-        minutes = date_object.minute
-        return jsonify({'minutes': minutes})
+    date_object = datetime.strptime(date_string, '%Y-%m-%dT%H:%M:%SZ')
+    minutes = date_object.minute
+    return jsonify({'minutes': minutes})
+
 @app.route('/commits_data/')
 def commits_data():
-    # API GitHub donnée dans l’énoncé
+    # API GitHub de l'énoncé
     api_url = "https://api.github.com/repos/OpenRSI/5MCSI_Metriques/commits"
 
-    # GitHub demande d’avoir un User-Agent dans l’en-tête HTTP
+    # GitHub veut un User-Agent sinon parfois il refuse la requête
     req = Request(api_url, headers={"User-Agent": "MetriquesApp"})
     response = urlopen(req)
     raw_content = response.read()
@@ -55,19 +60,15 @@ def commits_data():
     commits_per_minute = {}
 
     for commit in commits:
-        # Récupération de la date du commit
         date_str = commit.get('commit', {}).get('author', {}).get('date')
         if not date_str:
             continue
-
-        # Exemple de format : "2024-02-11T11:57:27Z"
+        # Exemple : "2024-02-11T11:57:27Z"
         date_object = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
-        minute = date_object.minute  # extrait la minute (0–59)
-
-        # Incrémentation du compteur pour cette minute
+        minute = date_object.minute
         commits_per_minute[minute] = commits_per_minute.get(minute, 0) + 1
 
-    # On transforme le dictionnaire en liste triée (plus pratique pour le front)
+    # Transformer en liste triée pour le JSON
     results = [
         {"minute": minute, "count": commits_per_minute[minute]}
         for minute in sorted(commits_per_minute.keys())
@@ -79,8 +80,5 @@ def commits_data():
 def commits():
     return render_template('commits.html')
 
-  
-  
-  
-if __name__ == "__main__":
+if name == "main":
   app.run(debug=True)

@@ -9,38 +9,34 @@
     <div id="histogram_div" style="width: 900px; height: 500px;"></div>
 
     <script>
-      // On charge la librairie Google Charts
       google.charts.load('current', { packages: ['corechart'] });
       google.charts.setOnLoadCallback(drawHistogram);
 
       function drawHistogram() {
         function drawChart(data) {
-          // Déclaration de la table de données pour Google Charts
           var dataTable = new google.visualization.DataTable();
           dataTable.addColumn('string', 'Date');
           dataTable.addColumn('number', 'Température (°C)');
 
-          // Transformation des données JSON en lignes pour le graphique
           data.results.forEach(entry => {
-            var date = new Date(entry.Jour * 1000); // timestamp → Date JS
+            var date = new Date(entry.Jour * 1000);
             dataTable.addRow([date.toLocaleDateString(), entry.temp]);
           });
 
-          // Options du graphique
           var options = {
             title: 'Histogramme des températures de Tawarano',
             legend: { position: 'none' },
             hAxis: { title: 'Date' },
             vAxis: { title: 'Température (°C)' }
           };
-// Création du graphique en colonnes
+
           var chart = new google.visualization.ColumnChart(
             document.getElementById('histogram_div')
           );
           chart.draw(dataTable, options);
         }
 
-        // Récupération des données depuis l’API Flask /tawarano/
+        // Récupération de données depuis l’API /tawarano/
         fetch('/tawarano/')
           .then(response => response.json())
           .then(data => {
@@ -50,4 +46,3 @@
     </script>
   </body>
 </html>
-
